@@ -10,6 +10,17 @@ const swaggerSpec = require('./config/swagger');
 
 const app = express();
 
+const cors = require('cors');
+
+const corsOptions = {
+  origin: '*', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'], 
+  credentials: true, 
+};
+
+app.use(cors(corsOptions)); 
+
 // Middleware para parsear JSON
 app.use(express.json());
 
@@ -29,6 +40,8 @@ app.use('/api/auth', authRoutes);
 // Rutas protegidas por autenticación
 app.use('/api/empleados', authenticateToken, empleadoRoutes);
 app.use('/api/solicitudes', authenticateToken, solicitudRoutes);
+
+
 
 // Conexión y sincronización de la base de datos
 (async () => {

@@ -9,7 +9,7 @@ exports.authenticateToken = (req, res, next) => {
 
   try {
     const user = jwt.verify(token, secret);
-    req.user = user; // Decodifica el token y almacena el usuario en la solicitud
+    req.user = user; 
     next();
   } catch (error) {
     res.status(403).json({ error: 'Token inválido' });

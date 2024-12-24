@@ -10,8 +10,8 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: 'http://localhost:3000',
-        description: 'Servidor de desarrollo',
+        url: 'http://localhost:3001',
+        description: 'Prueba técnica - http://localhost:3000/api/docs.json',
       },
     ],
     components: {

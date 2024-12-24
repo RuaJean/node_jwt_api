@@ -1,5 +1,5 @@
 const express = require('express');
-const { register, login, registerAdmin } = require('../controllers/authController');
+const { register, login, registerAdmin, getCurrentUser } = require('../controllers/authController');
 const { authenticateToken, isAdmin } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
@@ -62,6 +62,36 @@ router.post('/register-admin', authenticateToken, isAdmin, registerAdmin);
  *         description: Error en la solicitud
  */
 router.post('/register', register);
+
+/**
+ * @swagger
+ * /api/auth/me:
+ *   get:
+ *     summary: Retorna los datos del usuario actual
+ *     tags:
+ *       - Autenticación
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Información del usuario actual
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 nombre:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 rol:
+ *                   type: string
+ *       401:
+ *         description: No autorizado
+ */
+router.get('/me', authenticateToken, getCurrentUser);
 
 /**
  * @swagger
