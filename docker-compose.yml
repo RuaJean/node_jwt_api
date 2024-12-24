@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  # OPCIONAL: contenedor de PostgreSQL
+  db:
+    image: postgres:14
+    container_name: empresa_db
+    environment:
+      - POSTGRES_DB=empresa
+      - POSTGRES_USER=jeanrua
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jeanrua -d empresa || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Backend
+  backend:
+    build:
+      context: ./node_jwt_api
+      dockerfile: Dockerfile
+    container_name: empresa_backend
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+    environment:
+      # Sobrescribe variables que usará tu Node.js
+      - DB_URL=postgres://jeanrua:postgres@db:5432/empresa
+      - JWT_SECRET=nor0TuF0BmjUoaiqkD3h
+      - PORT=3001
+
+    # Si deseas usar data.sql/db.sql para inicializar, podrías:
+    # volumes:
+    #   - ./node_jwt_api/data.sql:/docker-entrypoint-initdb.d/data.sql
+    #   - ./node_jwt_api/db.sql:/docker-entrypoint-initdb.d/db.sql
+    #
+    # O que tu backend ejecute dichas migraciones.
+
+  # Frontend
+  frontend:
+    build:
+      context: ./ReactUI
+      dockerfile: Dockerfile
+    container_name: empresa_frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    # Si tu React (en .env) necesita REACT_APP_BACKEND_URL, puedes inyectarlo en build,
+    # pero por simplicidad se asume que ya lo configuraste en el .env local y "npm run build" la usa.
+
+volumes:
+  db_data:
